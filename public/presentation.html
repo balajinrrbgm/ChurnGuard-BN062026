@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChurnGuard — Presentation</title>
+  <title>ChurnGuard Presentation</title>
   <style>
     * {
       margin: 0;
@@ -12,368 +12,564 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #09090b;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0f0f13;
       color: #f8fafc;
       overflow: hidden;
     }
 
-    .presentation {
-      display: flex;
+    .presentation-container {
+      width: 100%;
       height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
-    .slides-container {
+    .slides-wrapper {
       flex: 1;
+      position: relative;
+      overflow: hidden;
       display: flex;
-      overflow-x: auto;
-      scroll-behavior: smooth;
-      scroll-snap-type: x mandatory;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slides {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .slide {
       min-width: 100%;
-      height: 100vh;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 60px;
-      scroll-snap-align: start;
+      flex-shrink: 0;
       position: relative;
-      overflow: hidden;
-    }
-
-    .slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 50%);
-      pointer-events: none;
     }
 
     .slide-content {
-      position: relative;
-      z-index: 1;
       max-width: 1000px;
       text-align: center;
+      width: 100%;
+      z-index: 10;
     }
 
-    h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      margin-bottom: 30px;
-      line-height: 1.2;
+    /* Slide 1: Title */
+    .slide-1 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1a1a2e 50%, #0f0f13 100%);
     }
 
-    h2 {
-      font-size: 2.5rem;
-      font-weight: 700;
+    .slide-1 h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    .slide-1 .highlight {
+      color: #3b82f6;
+    }
+
+    .slide-1 p {
+      font-size: 1.5rem;
+      color: #94a3b8;
       margin-bottom: 40px;
     }
 
-    p {
-      font-size: 1.3rem;
-      line-height: 1.6;
-      color: #cbd5e1;
-      margin-bottom: 20px;
+    .slide-1 .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      opacity: 0.9;
     }
 
-    .stat {
-      font-size: 2.5rem;
+    /* Slide 2: Problem */
+    .slide-2 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1f0f1f 100%);
+    }
+
+    .slide-2 h2 {
+      font-size: 3.5rem;
       font-weight: 700;
-      color: #3b82f6;
-      margin: 10px 0;
+      margin-bottom: 40px;
+      line-height: 1.2;
     }
 
-    .feature-grid {
+    .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      margin-top: 40px;
-      text-align: left;
-    }
-
-    .feature-item {
-      padding: 30px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-    }
-
-    .feature-item h3 {
-      font-size: 1.4rem;
-      margin-bottom: 15px;
-      color: #60a5fa;
-    }
-
-    .feature-item p {
-      font-size: 1.1rem;
-      text-align: left;
-    }
-
-    .highlight-blue {
-      color: #60a5fa;
-    }
-
-    .highlight-red {
-      color: #ef4444;
-    }
-
-    .controls {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 15px;
-      z-index: 100;
-    }
-
-    button {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.4);
-      color: #60a5fa;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-
-    button:hover {
-      background: rgba(59, 130, 246, 0.3);
-      border-color: rgba(59, 130, 246, 0.6);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .slide-counter {
-      position: fixed;
-      top: 30px;
-      right: 30px;
-      font-size: 1.2rem;
-      color: #94a3b8;
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #60a5fa;
-      position: fixed;
-      top: 30px;
-      left: 30px;
-      z-index: 100;
-    }
-
-    .slide-1 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
-    .slide-2 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
-    .slide-3 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
-    .slide-4 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
-    .slide-5 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
-    .slide-6 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
-
-    ul {
-      text-align: left;
-      font-size: 1.2rem;
-      line-height: 2;
-      color: #cbd5e1;
-    }
-
-    ul li {
-      margin-bottom: 15px;
-    }
-
-    .cta-button {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      border: none;
-      color: white;
-      padding: 16px 40px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-top: 30px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .cta-button:hover {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      transform: translateY(-2px);
-    }
-
-    .numbers {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 30px;
       margin-top: 40px;
     }
 
-    .number-box {
-      padding: 30px;
+    .stat-card {
       background: rgba(59, 130, 246, 0.1);
       border: 1px solid rgba(59, 130, 246, 0.3);
       border-radius: 12px;
+      padding: 30px;
     }
 
-    .number-box .big {
-      font-size: 2.5rem;
+    .stat-card .number {
+      font-size: 3rem;
       font-weight: 700;
-      color: #60a5fa;
+      color: #3b82f6;
       margin-bottom: 10px;
     }
 
-    .number-box .small {
+    .stat-card .label {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+    }
+
+    /* Slide 3: Solution */
+    .slide-3 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1a1a2e 100%);
+    }
+
+    .slide-3 h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 50px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .feature {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: left;
+    }
+
+    .feature h3 {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      color: #60a5fa;
+    }
+
+    .feature p {
       font-size: 0.95rem;
-      color: #94a3b8;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Slide 4: Technology */
+    .slide-4 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1f0f2e 100%);
+    }
+
+    .slide-4 h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 50px;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .tech-card {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 10px;
+      padding: 25px;
+    }
+
+    .tech-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #60a5fa;
+    }
+
+    .tech-card p {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Slide 5: Impact */
+    .slide-5 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1a1f2e 100%);
+    }
+
+    .slide-5 h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 50px;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .impact-card {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 12px;
+      padding: 35px;
+    }
+
+    .impact-card .value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #22c55e;
+      margin-bottom: 10px;
+    }
+
+    .impact-card .desc {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    /* Slide 6: CTA */
+    .slide-6 {
+      background: linear-gradient(135deg, #0f0f13 0%, #1a1a3e 100%);
+    }
+
+    .slide-6 h2 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .slide-6 p {
+      font-size: 1.2rem;
+      color: #cbd5e1;
+      margin-bottom: 50px;
+      max-width: 600px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: 2px solid;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    /* Navigation */
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(15, 15, 19, 0.8);
+      border-top: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .nav-button {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+      padding: 12px 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-button:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: #3b82f6;
+      width: 30px;
+      border-radius: 5px;
+    }
+
+    .dot:hover {
+      background: rgba(59, 130, 246, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .slide {
+        padding: 40px 30px;
+      }
+
+      .slide-1 h1 {
+        font-size: 2.5rem;
+      }
+
+      .slide-2 h2,
+      .slide-3 h2,
+      .slide-4 h2,
+      .slide-5 h2 {
+        font-size: 2rem;
+      }
+
+      .stats-grid,
+      .features-grid,
+      .tech-grid,
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navigation {
+        padding: 15px 30px;
+      }
+
+      .nav-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="logo">🛡️ ChurnGuard</div>
-  <div class="slide-counter"><span id="current">1</span> / 6</div>
-
-  <div class="presentation">
-    <div class="slides-container" id="slidesContainer">
-      <!-- Slide 1: Title -->
-      <div class="slide slide-1">
-        <div class="slide-content">
-          <h1 class="gradient-text">Predict Churn Before It Costs You</h1>
-          <p style="font-size: 1.5rem; margin-top: 40px; color: #94a3b8;">ChurnGuard: AI-powered customer health intelligence for B2B SaaS</p>
-          <p style="font-size: 1.2rem; margin-top: 60px; color: #64748b;">Built on Aurora DSQL + Amazon Bedrock</p>
-        </div>
-      </div>
-
-      <!-- Slide 2: The Problem -->
-      <div class="slide slide-2">
-        <div class="slide-content">
-          <h2>The Problem: Silent Customers</h2>
-          <div class="numbers">
-            <div class="number-box">
-              <div class="big">5-7%</div>
-              <div class="small">Average monthly churn for SaaS</div>
-            </div>
-            <div class="number-box">
-              <div class="big">30 days</div>
-              <div class="small">After cancellation, teams find out</div>
-            </div>
-            <div class="number-box">
-              <div class="big">50%</div>
-              <div class="small">Of churn preventable with early warning</div>
-            </div>
+  <div class="presentation-container">
+    <div class="slides-wrapper">
+      <div class="slides" id="slides">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-1">
+          <div class="slide-content">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%233b82f6' stroke-width='2'/%3E%3Cg stroke='%233b82f6' stroke-width='3'%3E%3Cline x1='100' y1='50' x2='100' y2='80'/%3E%3Cline x1='100' y1='80' x2='70' y2='110'/%3E%3Cline x1='100' y1='80' x2='130' y2='110'/%3E%3C/g%3E%3Ccircle cx='100' cy='100' r='10' fill='%233b82f6'/%3E%3Ccircle cx='70' cy='130' r='6' fill='%23ef4444'/%3E%3Ccircle cx='130' cy='130' r='6' fill='%23ef4444'/%3E%3Cpath d='M 70 150 Q 100 170 130 150' stroke='%233b82f6' stroke-width='2' fill='none'/%3E%3C/svg%3E" alt="ChurnGuard" class="slide-1 logo" />
+            <h1>Predict churn <span class="highlight">before it costs you</span></h1>
+            <p>AI-powered customer health intelligence platform</p>
           </div>
-          <p style="margin-top: 50px; font-size: 1.4rem;">Your best customers leave <span class="highlight-red">without warning</span>.</p>
         </div>
-      </div>
 
-      <!-- Slide 3: The Solution -->
-      <div class="slide slide-3">
-        <div class="slide-content">
-          <h2>ChurnGuard: Early Warning System</h2>
-          <div class="feature-grid">
-            <div class="feature-item">
-              <h3>📊 Real-Time Health Scoring</h3>
-              <p>15 behavioral signals → 0-100 health score. Updated every time a customer event is ingested.</p>
-            </div>
-            <div class="feature-item">
-              <h3>🔮 Predictive Churn Risk</h3>
-              <p>AI identifies at-risk customers 30-60 days before they cancel. Catch declining logins, shrinking usage, support spikes.</p>
-            </div>
-            <div class="feature-item">
-              <h3>⚡ Automated Playbooks</h3>
-              <p>Health drops → Slack alert to CSM → email sequence → task assigned. Human actions at machine speed.</p>
-            </div>
-            <div class="feature-item">
-              <h3>🌍 Global Consistency</h3>
-              <p>Aurora DSQL active-active replication. Events from Tokyo, London, NY all update scores instantly—no eventual consistency.</p>
+        <!-- Slide 2: Problem -->
+        <div class="slide slide-2">
+          <div class="slide-content">
+            <h2>The Problem</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="number">5-7%</div>
+                <div class="label">Average SaaS Churn Rate</div>
+              </div>
+              <div class="stat-card">
+                <div class="number">30 Days</div>
+                <div class="label">Average Detection Lag</div>
+              </div>
+              <div class="stat-card">
+                <div class="number">50%</div>
+                <div class="label">Preventable Churn</div>
+              </div>
+              <div class="stat-card">
+                <div class="number">$100K+</div>
+                <div class="label">Revenue at Risk</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Slide 4: Technology -->
-      <div class="slide slide-4">
-        <div class="slide-content">
-          <h2>Built on Cloud-Native AWS</h2>
-          <ul>
-            <li><span class="highlight-blue">Aurora DSQL</span> — Serverless distributed SQL. Customers worldwide, zero replication lag.</li>
-            <li><span class="highlight-blue">Amazon Bedrock (Claude 3 Haiku)</span> — AI churn analysis. "Why is this customer at risk? What should we do?"</li>
-            <li><span class="highlight-blue">Vercel</span> — Edge-deployed Next.js. Sub-100ms page loads globally.</li>
-            <li><span class="highlight-blue">EventBridge + Lambda</span> — Serverless event pipeline. Process 1000s of events/second.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Slide 5: Impact -->
-      <div class="slide slide-5">
-        <div class="slide-content">
-          <h2>Real Revenue Impact</h2>
-          <div class="numbers">
-            <div class="number-box">
-              <div class="big">$100K</div>
-              <div class="small">Revenue at risk per month (at 10% churn on $1M ARR)</div>
-            </div>
-            <div class="number-box">
-              <div class="big">30%</div>
-              <div class="small">Typical churn prevention rate</div>
-            </div>
-            <div class="number-box">
-              <div class="big">$30K</div>
-              <div class="small">Monthly revenue protected</div>
+        <!-- Slide 3: Solution -->
+        <div class="slide slide-3">
+          <div class="slide-content">
+            <h2>Our Solution</h2>
+            <div class="features-grid">
+              <div class="feature">
+                <h3>✨ Real-Time Health Scoring</h3>
+                <p>15 behavioral signals analyzed instantly. 0-100 health score updated with every customer event via Aurora DSQL.</p>
+              </div>
+              <div class="feature">
+                <h3>🎯 Predictive Churn Detection</h3>
+                <p>AI model identifies at-risk customers 30-60 days before they cancel. Catch declining logins, shrinking feature usage, rising support tickets.</p>
+              </div>
+              <div class="feature">
+                <h3>⚡ Automated Playbooks</h3>
+                <p>Trigger actions: email alerts, Slack notifications, task assignments. No code required. Event-driven architecture scales to millions of events.</p>
+              </div>
+              <div class="feature">
+                <h3>🔗 Global Consistency</h3>
+                <p>Aurora DSQL ensures customer health scores are consistent globally in milliseconds, whether your customers are in Tokyo or New York.</p>
+              </div>
             </div>
           </div>
-          <p style="margin-top: 50px; font-size: 1.3rem;">For a $1M ARR company: <span class="highlight-blue">$30K/month saved = $360K/year</span></p>
         </div>
-      </div>
 
-      <!-- Slide 6: Call to Action -->
-      <div class="slide slide-6">
-        <div class="slide-content">
-          <h2>Start Saving Revenue Today</h2>
-          <p style="font-size: 1.4rem; margin-top: 40px;">ChurnGuard is built for CS teams that refuse to let customers slip away.</p>
-          <ul style="margin-top: 40px; font-size: 1.2rem;">
-            <li>✅ 5-minute setup</li>
-            <li>✅ No code integration via REST API</li>
-            <li>✅ Aurora DSQL: strong consistency, global scale</li>
-            <li>✅ AI-powered insights from Amazon Bedrock</li>
-          </ul>
-          <button class="cta-button" onclick="alert('Thank you for watching! Visit the docs for integration steps.')">Let's Build Together →</button>
+        <!-- Slide 4: Technology -->
+        <div class="slide slide-4">
+          <div class="slide-content">
+            <h2>Technology Stack</h2>
+            <div class="tech-grid">
+              <div class="tech-card">
+                <h3>🗄️ Aurora DSQL</h3>
+                <p>Serverless PostgreSQL with active-active replication. Global consistency for real-time health scoring.</p>
+              </div>
+              <div class="tech-card">
+                <h3>🤖 Amazon Bedrock</h3>
+                <p>Claude 3 Haiku AI model for intelligent churn analysis and personalized recommendations.</p>
+              </div>
+              <div class="tech-card">
+                <h3>⚡ Vercel Edge</h3>
+                <p>Deployed on Vercel with sub-100ms API response times. Auto-scales to handle traffic spikes.</p>
+              </div>
+              <div class="tech-card">
+                <h3>⏰ EventBridge + Lambda</h3>
+                <p>Scheduled health score refresh every 15 minutes. Serverless automation with full monitoring.</p>
+              </div>
+              <div class="tech-card">
+                <h3>🔐 NextAuth.js</h3>
+                <p>Enterprise-grade authentication with Google OAuth. Secure JWT sessions with 30-day maxAge.</p>
+              </div>
+              <div class="tech-card">
+                <h3>📊 Real-Time Dashboard</h3>
+                <p>Live React UI with Framer Motion animations. Recharts visualization for churn trends and revenue impact.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5: Impact -->
+        <div class="slide slide-5">
+          <div class="slide-content">
+            <h2>Business Impact</h2>
+            <div class="impact-grid">
+              <div class="impact-card">
+                <div class="value">$100K</div>
+                <div class="desc">Revenue at Risk Detected</div>
+              </div>
+              <div class="impact-card">
+                <div class="value">30%</div>
+                <div class="desc">Churn Prevention Rate</div>
+              </div>
+              <div class="impact-card">
+                <div class="value">$30K</div>
+                <div class="desc">Monthly Savings Potential</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: Call to Action -->
+        <div class="slide slide-6">
+          <div class="slide-content">
+            <h2>Start Protecting Revenue Today</h2>
+            <p>5-minute setup. No credit card required. Works with your existing data.</p>
+            <div class="cta-buttons">
+              <button class="btn btn-primary">Get Started Free</button>
+              <button class="btn btn-secondary">View Live Demo</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="controls">
-    <button id="prevBtn" onclick="prevSlide()">← Previous</button>
-    <button id="nextBtn" onclick="nextSlide()">Next →</button>
+    <!-- Navigation -->
+    <div class="navigation">
+      <button class="nav-button" id="prevBtn">← Previous</button>
+      <div class="dots" id="dotsContainer"></div>
+      <div class="slide-counter"><span id="currentSlide">1</span> / 6</div>
+      <button class="nav-button" id="nextBtn">Next →</button>
+    </div>
   </div>
 
   <script>
     let currentSlide = 0;
-    const slidesContainer = document.getElementById('slidesContainer');
-    const currentCounter = document.getElementById('current');
-    const slides = document.querySelectorAll('.slide');
-    const totalSlides = slides.length;
+    const totalSlides = 6;
+    const slidesElement = document.getElementById('slides');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const currentSlideSpan = document.getElementById('currentSlide');
+    const dotsContainer = document.getElementById('dotsContainer');
+
+    // Create dots
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    const dots = document.querySelectorAll('.dot');
 
     function updateSlide() {
-      slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-      currentCounter.textContent = currentSlide + 1;
-      document.getElementById('prevBtn').disabled = currentSlide === 0;
-      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+      slidesElement.style.transform = `translateX(-${currentSlide * 100}%)`;
+      currentSlideSpan.textContent = currentSlide + 1;
+      
+      // Update dots
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+
+      // Update button states
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(n) {
+      currentSlide = n;
+      updateSlide();
     }
 
     function nextSlide() {
@@ -389,6 +585,9 @@
         updateSlide();
       }
     }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
