@@ -1,0 +1,244 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  ChurnGuard — B2B Customer Intelligence Platform.
+  Region: eu-central-1 (Frankfurt)
+  References existing VPC + Subnets (neurodash-vpc).
+  Provisions: Secrets Manager + Lambda + EventBridge + CloudWatch + Aurora DSQL IAM + Amazon Bedrock IAM.
+  Aurora DSQL is serverless and managed by AWS — provisioned separately via AWS Console or CLI.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues: [dev, staging, prod]
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Existing VPC ID (neurodash-vpc)
+    Default: vpc-0f4a0618c74867471
+
+  SubnetId1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Existing Subnet 1 (10.0.1.0/24, eu-central-1)
+    Default: subnet-07e4a8d79ccf6e384
+
+  SubnetId2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Existing Subnet 2 (10.0.2.0/24, eu-central-1b)
+    Default: subnet-0a73e8659261408f9
+
+  InternetGatewayId:
+    Type: String
+    Description: Existing Internet Gateway ID
+    Default: igw-02d64f5c4e6f0e592
+
+  DSQLClusterEndpoint:
+    Type: String
+    Description: >
+      Aurora DSQL cluster endpoint (from AWS Console after cluster creation).
+      Aurora DSQL is provisioned separately via AWS Console or CLI.
+      Format: your-cluster-id.dsql.eu-central-1.on.aws
+
+  DSQLAdminPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 12
+    Description: Aurora DSQL admin password
+
+# ──────────────────────────────────────────────────────────────────────────────
+Resources:
+
+  # ── Secrets Manager — DSQL credentials ──────────────────────────────────────
+  DSQLCredentialsSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub churnguard/${Environment}/dsql-credentials
+      Description: Aurora DSQL admin credentials for ChurnGuard
+      SecretString: !Sub |
+        {
+          "endpoint": "${DSQLClusterEndpoint}",
+          "password": "${DSQLAdminPassword}",
+          "database": "postgres"
+        }
+      Tags:
+        - Key: Project
+          Value: ChurnGuard
+
+  # ── Lambda — Health Score Batch Recalculator ─────────────────────────────────
+  HealthScoreRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub churnguard-${Environment}-health-score-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SecretsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref DSQLCredentialsSecret
+        - PolicyName: SESAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ses:SendEmail
+                Resource: '*'
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:Converse
+                Resource:
+                  # Claude 3 Haiku cross-region inference profile — eu-central-1
+                  - !Sub 'arn:aws:bedrock:eu-central-1::foundation-model/eu.anthropic.claude-3-haiku-20240307-v1:0'
+                  # Fallback: direct model ARN
+                  - !Sub 'arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+
+  HealthScoreFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub churnguard-${Environment}-health-recalculator
+      Description: Batch recalculates health scores for all active customers
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt HealthScoreRole.Arn
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          DSQL_SECRET_ARN: !Ref DSQLCredentialsSecret
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          // Placeholder — deploy via CI/CD
+          exports.handler = async (event) => {
+            console.log('Health score recalculator invoked');
+          };
+      Tags:
+        - Key: Project
+          Value: ChurnGuard
+
+  # Run health score batch every 15 minutes
+  HealthScoreSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub churnguard-${Environment}-health-schedule
+      ScheduleExpression: rate(15 minutes)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt HealthScoreFunction.Arn
+          Id: HealthScoreTarget
+
+  HealthScoreLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HealthScoreFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HealthScoreSchedule.Arn
+
+  # ── Lambda — Playbook Executor ───────────────────────────────────────────────
+  PlaybookExecutorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub churnguard-${Environment}-playbook-executor
+      Description: Executes playbook actions (Slack, email) for at-risk customers
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt HealthScoreRole.Arn
+      Timeout: 120
+      MemorySize: 256
+      Environment:
+        Variables:
+          DSQL_SECRET_ARN: !Ref DSQLCredentialsSecret
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            console.log('Playbook executor invoked', JSON.stringify(event));
+          };
+      Tags:
+        - Key: Project
+          Value: ChurnGuard
+
+  # ── CloudWatch Dashboard ─────────────────────────────────────────────────────
+  ChurnGuardDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub churnguard-${Environment}-ops
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "properties": {
+                "title": "Lambda Health Recalculator Invocations",
+                "metrics": [["AWS/Lambda", "Invocations", "FunctionName", "${HealthScoreFunction}"]],
+                "period": 300,
+                "stat": "Sum"
+              }
+            },
+            {
+              "type": "metric",
+              "properties": {
+                "title": "Lambda Errors",
+                "metrics": [
+                  ["AWS/Lambda", "Errors", "FunctionName", "${HealthScoreFunction}"],
+                  ["AWS/Lambda", "Errors", "FunctionName", "${PlaybookExecutorFunction}"]
+                ],
+                "period": 300,
+                "stat": "Sum"
+              }
+            }
+          ]
+        }
+
+# ──────────────────────────────────────────────────────────────────────────────
+Outputs:
+  DSQLCredentialsSecretARN:
+    Description: Secrets Manager ARN for DSQL credentials
+    Value: !Ref DSQLCredentialsSecret
+
+  HealthScoreFunctionARN:
+    Description: Lambda ARN for health score recalculator
+    Value: !GetAtt HealthScoreFunction.Arn
+
+  PlaybookExecutorFunctionARN:
+    Description: Lambda ARN for playbook executor
+    Value: !GetAtt PlaybookExecutorFunction.Arn
+
+  ExistingVpcId:
+    Description: Existing VPC ID (neurodash-vpc)
+    Value: !Ref VpcId
+
+  ExistingSubnetId1:
+    Description: Existing Subnet 1 (10.0.1.0/24)
+    Value: !Ref SubnetId1
+
+  ExistingSubnetId2:
+    Description: Existing Subnet 2 (10.0.2.0/24)
+    Value: !Ref SubnetId2
+
+  ExistingInternetGatewayId:
+    Description: Existing Internet Gateway ID
+    Value: !Ref InternetGatewayId
+
+  # Instructions for Aurora DSQL provisioning (done outside CloudFormation)
+  DSQLProvisioningNote:
+    Description: >
+      Aurora DSQL clusters are provisioned via AWS Console or CLI.
+      Run: aws dsql create-cluster --region eu-central-1
+      Then update DATABASE_URL in Vercel with the cluster endpoint.
+    Value: "See AWS Console: Aurora DSQL > Create cluster > eu-central-1"

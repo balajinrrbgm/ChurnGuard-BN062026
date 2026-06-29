@@ -1,0 +1,199 @@
+<svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .diagram-bg { fill: #09090b; }
+      .box { fill: #1a1f3a; stroke: #3b82f6; stroke-width: 2; }
+      .box-highlight { fill: #1e3a8a; stroke: #60a5fa; stroke-width: 2; }
+      .arrow { stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+      .arrow-bold { stroke: #3b82f6; stroke-width: 3; marker-end: url(#arrowhead-blue); }
+      .text-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; fill: #e2e8f0; font-weight: 500; }
+      .text-small { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; fill: #94a3b8; }
+      .text-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; fill: #60a5fa; font-weight: 700; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; fill: #60a5fa; font-weight: 700; }
+      .header { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 28px; fill: #e2e8f0; font-weight: 700; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#64748b"/>
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3b82f6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="900" class="diagram-bg"/>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" class="header">ChurnGuard Architecture — EU Central-1 (Frankfurt)</text>
+
+  <!-- LEFT: Client Layer -->
+  <g>
+    <text x="50" y="90" class="section-title">Client</text>
+    <rect x="30" y="110" width="200" height="60" class="box"/>
+    <text x="130" y="145" text-anchor="middle" class="text-title">Browser</text>
+    <text x="130" y="165" text-anchor="middle" class="text-small">Next.js App (Vercel)</text>
+  </g>
+
+  <!-- Arrow to Vercel -->
+  <path d="M 230 140 L 320 140" class="arrow-bold"/>
+
+  <!-- CENTER: Vercel Edge -->
+  <g>
+    <text x="350" y="90" class="section-title">Vercel Edge (Deployed)</text>
+    
+    <!-- API Gateway -->
+    <rect x="330" y="110" width="180" height="60" class="box"/>
+    <text x="420" y="140" text-anchor="middle" class="text-title">API Routes</text>
+    <text x="420" y="160" text-anchor="middle" class="text-small">/api/ingest, /insights, /auth</text>
+
+    <!-- NextAuth -->
+    <rect x="330" y="190" width="180" height="60" class="box"/>
+    <text x="420" y="215" text-anchor="middle" class="text-title">NextAuth.js</text>
+    <text x="420" y="235" text-anchor="middle" class="text-small">Google OAuth</text>
+  </g>
+
+  <!-- Arrow to AWS -->
+  <path d="M 510 140 L 600 140" class="arrow-bold"/>
+  <path d="M 510 220 L 600 220" class="arrow-bold"/>
+
+  <!-- RIGHT: AWS Services Layer -->
+  <g>
+    <text x="620" y="90" class="section-title">AWS (eu-central-1)</text>
+    
+    <!-- Aurora DSQL -->
+    <rect x="600" y="110" width="200" height="70" class="box-highlight"/>
+    <text x="700" y="135" text-anchor="middle" class="text-title">Aurora DSQL</text>
+    <text x="700" y="155" text-anchor="middle" class="text-small">Serverless SQL</text>
+    <text x="700" y="170" text-anchor="middle" class="text-small">Cluster (Global Consistency)</text>
+
+    <!-- Amazon Bedrock -->
+    <rect x="600" y="200" width="200" height="70" class="box"/>
+    <text x="700" y="225" text-anchor="middle" class="text-title">Amazon Bedrock</text>
+    <text x="700" y="245" text-anchor="middle" class="text-small">Claude 3 Haiku</text>
+    <text x="700" y="260" text-anchor="middle" class="text-small">AI Churn Analysis</text>
+
+    <!-- Secrets Manager -->
+    <rect x="600" y="290" width="200" height="70" class="box"/>
+    <text x="700" y="315" text-anchor="middle" class="text-title">Secrets Manager</text>
+    <text x="700" y="335" text-anchor="middle" class="text-small">DSQL Credentials</text>
+    <text x="700" y="350" text-anchor="middle" class="text-small">API Keys</text>
+  </g>
+
+  <!-- Data Flow Annotations -->
+  <g>
+    <!-- From API to DSQL -->
+    <text x="550" y="120" class="text-small" fill="#60a5fa">Events</text>
+    <text x="550" y="160" class="text-small" fill="#60a5fa">Queries</text>
+    
+    <!-- From API to Bedrock -->
+    <text x="520" y="230" class="text-small" fill="#60a5fa">Health Data</text>
+  </g>
+
+  <!-- BOTTOM: Data Pipeline -->
+  <g>
+    <text x="50" y="420" class="section-title">Data Pipeline</text>
+
+    <!-- SaaS Tenant SDKs -->
+    <rect x="30" y="440" width="150" height="70" class="box"/>
+    <text x="105" y="465" text-anchor="middle" class="text-title">SaaS SDK</text>
+    <text x="105" y="485" text-anchor="middle" class="text-small">Sends events:</text>
+    <text x="105" y="500" text-anchor="middle" class="text-small">login, feature_used</text>
+
+    <!-- Arrow -->
+    <path d="M 180 475 L 260 475" class="arrow-bold"/>
+    <text x="215" y="460" class="text-small" fill="#60a5fa">POST /api/ingest</text>
+
+    <!-- Event Ingest -->
+    <rect x="260" y="440" width="150" height="70" class="box"/>
+    <text x="335" y="465" text-anchor="middle" class="text-title">Event Ingest</text>
+    <text x="335" y="485" text-anchor="middle" class="text-small">Validate &amp; Auth</text>
+    <text x="335" y="500" text-anchor="middle" class="text-small">Rate Limit</text>
+
+    <!-- Arrow -->
+    <path d="M 410 475 L 490 475" class="arrow-bold"/>
+    <text x="445" y="460" class="text-small" fill="#60a5fa">Batch Write</text>
+
+    <!-- Health Score Calc -->
+    <rect x="490" y="440" width="150" height="70" class="box-highlight"/>
+    <text x="565" y="465" text-anchor="middle" class="text-title">Health Score</text>
+    <text x="565" y="485" text-anchor="middle" class="text-small">15 Signals:</text>
+    <text x="565" y="500" text-anchor="middle" class="text-small">Logins, Features, Support</text>
+
+    <!-- Arrow -->
+    <path d="M 640 475 L 720 475" class="arrow-bold"/>
+    <text x="675" y="460" class="text-small" fill="#60a5fa">Score 0-100</text>
+
+    <!-- AI Analysis -->
+    <rect x="720" y="440" width="150" height="70" class="box"/>
+    <text x="795" y="465" text-anchor="middle" class="text-title">Bedrock Analysis</text>
+    <text x="795" y="485" text-anchor="middle" class="text-small">Churn Probability</text>
+    <text x="795" y="500" text-anchor="middle" class="text-small">Recommendations</text>
+
+    <!-- Arrow -->
+    <path d="M 870 475 L 950 475" class="arrow-bold"/>
+    <text x="905" y="460" class="text-small" fill="#60a5fa">Playbook</text>
+
+    <!-- Automated Actions -->
+    <rect x="950" y="440" width="150" height="70" class="box"/>
+    <text x="1025" y="465" text-anchor="middle" class="text-title">Automated Actions</text>
+    <text x="1025" y="485" text-anchor="middle" class="text-small">Slack, Email, Task</text>
+    <text x="1025" y="500" text-anchor="middle" class="text-small">Assignment</text>
+  </g>
+
+  <!-- RIGHT: Real-Time Monitoring -->
+  <g>
+    <text x="1100" y="420" class="section-title">Monitoring</text>
+
+    <rect x="1080" y="440" width="280" height="200" class="box" fill="none" stroke="#64748b" stroke-dasharray="5,5"/>
+    
+    <text x="1220" y="465" text-anchor="middle" class="text-title">Dashboards</text>
+    <rect x="1100" y="480" width="240" height="40" class="box" fill="#16213e"/>
+    <text x="1220" y="505" text-anchor="middle" class="text-small">• Customer Risk Scores</text>
+    
+    <rect x="1100" y="535" width="240" height="40" class="box" fill="#16213e"/>
+    <text x="1220" y="560" text-anchor="middle" class="text-small">• MRR at Risk (by segment)</text>
+
+    <rect x="1100" y="590" width="240" height="40" class="box" fill="#16213e"/>
+    <text x="1220" y="615" text-anchor="middle" class="text-small">• Playbook Performance</text>
+  </g>
+
+  <!-- BOTTOM: Key Features -->
+  <g>
+    <text x="50" y="750" class="section-title">Key Characteristics</text>
+
+    <!-- Box 1: DSQL -->
+    <rect x="30" y="770" width="220" height="100" class="box"/>
+    <text x="140" y="795" text-anchor="middle" class="text-title">🌍 Aurora DSQL</text>
+    <text x="140" y="815" text-anchor="middle" class="text-small">Active-Active</text>
+    <text x="140" y="830" text-anchor="middle" class="text-small">Multi-Region</text>
+    <text x="140" y="845" text-anchor="middle" class="text-small">Strong Consistency</text>
+
+    <!-- Box 2: Bedrock -->
+    <rect x="270" y="770" width="220" height="100" class="box"/>
+    <text x="380" y="795" text-anchor="middle" class="text-title">🤖 AI-Powered</text>
+    <text x="380" y="815" text-anchor="middle" class="text-small">Bedrock Claude 3</text>
+    <text x="380" y="830" text-anchor="middle" class="text-small">Churn Prediction</text>
+    <text x="380" y="845" text-anchor="middle" class="text-small">Recommendations</text>
+
+    <!-- Box 3: Serverless -->
+    <rect x="510" y="770" width="220" height="100" class="box"/>
+    <text x="620" y="795" text-anchor="middle" class="text-title">⚡ Serverless</text>
+    <text x="620" y="815" text-anchor="middle" class="text-small">No Ops Overhead</text>
+    <text x="620" y="830" text-anchor="middle" class="text-small">Auto-Scaling</text>
+    <text x="620" y="845" text-anchor="middle" class="text-small">Pay per Event</text>
+
+    <!-- Box 4: Real-Time -->
+    <rect x="750" y="770" width="220" height="100" class="box"/>
+    <text x="860" y="795" text-anchor="middle" class="text-title">⏱️ Real-Time</text>
+    <text x="860" y="815" text-anchor="middle" class="text-small">Sub-Second Updates</text>
+    <text x="860" y="830" text-anchor="middle" class="text-small">Global Consistency</text>
+    <text x="860" y="845" text-anchor="middle" class="text-small">No Latency</text>
+
+    <!-- Box 5: Events -->
+    <rect x="990" y="770" width="220" height="100" class="box"/>
+    <text x="1100" y="795" text-anchor="middle" class="text-title">📊 Event-Driven</text>
+    <text x="1100" y="815" text-anchor="middle" class="text-small">REST API Ingest</text>
+    <text x="1100" y="830" text-anchor="middle" class="text-small">Batch Processing</text>
+    <text x="1100" y="845" text-anchor="middle" class="text-small">1000s/sec Throughput</text>
+  </g>
+</svg>

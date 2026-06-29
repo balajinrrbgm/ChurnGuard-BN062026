@@ -1,0 +1,51 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #09090b; }
+      .shield { fill: none; stroke: #60a5fa; stroke-width: 3; stroke-linejoin: round; }
+      .shield-fill { fill: #1e3a8a; opacity: 0.8; }
+      .heart { fill: #ef4444; }
+      .pulse { fill: none; stroke: #3b82f6; stroke-width: 2; stroke-linecap: round; }
+      .arrow { fill: none; stroke: #22c55e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      .text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; text-anchor: middle; }
+      .title { font-size: 44px; fill: #e2e8f0; }
+      .subtitle { font-size: 20px; fill: #60a5fa; letter-spacing: 1px; }
+    </style>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:0.1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" class="bg"/>
+  <circle cx="200" cy="200" r="200" fill="url(#grad1)"/>
+
+  <!-- Outer Circle Border -->
+  <circle cx="200" cy="200" r="190" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.3"/>
+
+  <!-- Shield -->
+  <g>
+    <!-- Shield shape -->
+    <path d="M 200 80 L 320 140 L 320 240 C 320 320 200 360 200 360 C 200 360 80 320 80 240 L 80 140 Z" class="shield-fill"/>
+    <path d="M 200 80 L 320 140 L 320 240 C 320 320 200 360 200 360 C 200 360 80 320 80 240 L 80 140 Z" class="shield"/>
+  </g>
+
+  <!-- Heart + Pulse Icon -->
+  <g>
+    <!-- Upward arrow -->
+    <path d="M 200 220 L 200 140 M 180 160 L 200 140 L 220 160" class="arrow"/>
+    
+    <!-- Health dots -->
+    <circle cx="170" cy="200" r="6" class="heart" opacity="0.8"/>
+    <circle cx="200" cy="190" r="8" class="heart"/>
+    <circle cx="230" cy="200" r="6" class="heart" opacity="0.8"/>
+
+    <!-- Pulse line (stylized) -->
+    <path d="M 160 260 L 180 260 L 190 245 L 200 260 L 220 260 L 230 250 L 240 260" class="pulse"/>
+  </g>
+
+  <!-- Text -->
+  <text x="200" y="340" class="text title">CG</text>
+  <text x="200" y="368" class="text subtitle">ChurnGuard</text>
+</svg>

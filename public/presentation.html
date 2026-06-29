@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChurnGuard — Presentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #09090b;
+      color: #f8fafc;
+      overflow: hidden;
+    }
+
+    .presentation {
+      display: flex;
+      height: 100vh;
+    }
+
+    .slides-container {
+      flex: 1;
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 40px;
+    }
+
+    p {
+      font-size: 1.3rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin: 10px 0;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .feature-item {
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+    }
+
+    .feature-item h3 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #60a5fa;
+    }
+
+    .feature-item p {
+      font-size: 1.1rem;
+      text-align: left;
+    }
+
+    .highlight-blue {
+      color: #60a5fa;
+    }
+
+    .highlight-red {
+      color: #ef4444;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    button {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      font-size: 1.2rem;
+      color: #94a3b8;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #60a5fa;
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      z-index: 100;
+    }
+
+    .slide-1 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
+    .slide-2 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
+    .slide-3 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
+    .slide-4 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
+    .slide-5 { background: linear-gradient(135deg, rgba(30, 30, 40, 0.8), rgba(15, 15, 23, 0.9)); }
+    .slide-6 { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 30, 40, 0.8)); }
+
+    ul {
+      text-align: left;
+      font-size: 1.2rem;
+      line-height: 2;
+      color: #cbd5e1;
+    }
+
+    ul li {
+      margin-bottom: 15px;
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: none;
+      color: white;
+      padding: 16px 40px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cta-button:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-2px);
+    }
+
+    .numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .number-box {
+      padding: 30px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+    }
+
+    .number-box .big {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 10px;
+    }
+
+    .number-box .small {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">🛡️ ChurnGuard</div>
+  <div class="slide-counter"><span id="current">1</span> / 6</div>
+
+  <div class="presentation">
+    <div class="slides-container" id="slidesContainer">
+      <!-- Slide 1: Title -->
+      <div class="slide slide-1">
+        <div class="slide-content">
+          <h1 class="gradient-text">Predict Churn Before It Costs You</h1>
+          <p style="font-size: 1.5rem; margin-top: 40px; color: #94a3b8;">ChurnGuard: AI-powered customer health intelligence for B2B SaaS</p>
+          <p style="font-size: 1.2rem; margin-top: 60px; color: #64748b;">Built on Aurora DSQL + Amazon Bedrock</p>
+        </div>
+      </div>
+
+      <!-- Slide 2: The Problem -->
+      <div class="slide slide-2">
+        <div class="slide-content">
+          <h2>The Problem: Silent Customers</h2>
+          <div class="numbers">
+            <div class="number-box">
+              <div class="big">5-7%</div>
+              <div class="small">Average monthly churn for SaaS</div>
+            </div>
+            <div class="number-box">
+              <div class="big">30 days</div>
+              <div class="small">After cancellation, teams find out</div>
+            </div>
+            <div class="number-box">
+              <div class="big">50%</div>
+              <div class="small">Of churn preventable with early warning</div>
+            </div>
+          </div>
+          <p style="margin-top: 50px; font-size: 1.4rem;">Your best customers leave <span class="highlight-red">without warning</span>.</p>
+        </div>
+      </div>
+
+      <!-- Slide 3: The Solution -->
+      <div class="slide slide-3">
+        <div class="slide-content">
+          <h2>ChurnGuard: Early Warning System</h2>
+          <div class="feature-grid">
+            <div class="feature-item">
+              <h3>📊 Real-Time Health Scoring</h3>
+              <p>15 behavioral signals → 0-100 health score. Updated every time a customer event is ingested.</p>
+            </div>
+            <div class="feature-item">
+              <h3>🔮 Predictive Churn Risk</h3>
+              <p>AI identifies at-risk customers 30-60 days before they cancel. Catch declining logins, shrinking usage, support spikes.</p>
+            </div>
+            <div class="feature-item">
+              <h3>⚡ Automated Playbooks</h3>
+              <p>Health drops → Slack alert to CSM → email sequence → task assigned. Human actions at machine speed.</p>
+            </div>
+            <div class="feature-item">
+              <h3>🌍 Global Consistency</h3>
+              <p>Aurora DSQL active-active replication. Events from Tokyo, London, NY all update scores instantly—no eventual consistency.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Technology -->
+      <div class="slide slide-4">
+        <div class="slide-content">
+          <h2>Built on Cloud-Native AWS</h2>
+          <ul>
+            <li><span class="highlight-blue">Aurora DSQL</span> — Serverless distributed SQL. Customers worldwide, zero replication lag.</li>
+            <li><span class="highlight-blue">Amazon Bedrock (Claude 3 Haiku)</span> — AI churn analysis. "Why is this customer at risk? What should we do?"</li>
+            <li><span class="highlight-blue">Vercel</span> — Edge-deployed Next.js. Sub-100ms page loads globally.</li>
+            <li><span class="highlight-blue">EventBridge + Lambda</span> — Serverless event pipeline. Process 1000s of events/second.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 5: Impact -->
+      <div class="slide slide-5">
+        <div class="slide-content">
+          <h2>Real Revenue Impact</h2>
+          <div class="numbers">
+            <div class="number-box">
+              <div class="big">$100K</div>
+              <div class="small">Revenue at risk per month (at 10% churn on $1M ARR)</div>
+            </div>
+            <div class="number-box">
+              <div class="big">30%</div>
+              <div class="small">Typical churn prevention rate</div>
+            </div>
+            <div class="number-box">
+              <div class="big">$30K</div>
+              <div class="small">Monthly revenue protected</div>
+            </div>
+          </div>
+          <p style="margin-top: 50px; font-size: 1.3rem;">For a $1M ARR company: <span class="highlight-blue">$30K/month saved = $360K/year</span></p>
+        </div>
+      </div>
+
+      <!-- Slide 6: Call to Action -->
+      <div class="slide slide-6">
+        <div class="slide-content">
+          <h2>Start Saving Revenue Today</h2>
+          <p style="font-size: 1.4rem; margin-top: 40px;">ChurnGuard is built for CS teams that refuse to let customers slip away.</p>
+          <ul style="margin-top: 40px; font-size: 1.2rem;">
+            <li>✅ 5-minute setup</li>
+            <li>✅ No code integration via REST API</li>
+            <li>✅ Aurora DSQL: strong consistency, global scale</li>
+            <li>✅ AI-powered insights from Amazon Bedrock</li>
+          </ul>
+          <button class="cta-button" onclick="alert('Thank you for watching! Visit the docs for integration steps.')">Let's Build Together →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn" onclick="prevSlide()">← Previous</button>
+    <button id="nextBtn" onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slidesContainer = document.getElementById('slidesContainer');
+    const currentCounter = document.getElementById('current');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function updateSlide() {
+      slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+      currentCounter.textContent = currentSlide + 1;
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Initialize
+    updateSlide();
+  </script>
+</body>
+</html>
