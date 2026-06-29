@@ -3,15 +3,53 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowLeft, TrendingDown, AlertTriangle, Users, DollarSign } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+// Mark as dynamic - don't pre-render
+export const dynamic = 'force-dynamic'
+
+interface Customer {
+  name: string
+  mrr: number
+  score: number
+  risk: 'critical' | 'high' | 'medium' | 'low'
+  lastSeen: string
+}
+
+interface DemoData {
+  customers: Customer[]
+  summary: {
+    totalMRR: number
+    mrrAtRisk: number
+    criticalCount: number
+    avgHealth: number
+  }
+}
 
 export default function DemoPage() {
-  const DEMO_CUSTOMERS = [
-    { name: 'Acme Corp', mrr: 4200, score: 23, risk: 'critical', trend: -15, lastSeen: '12 days ago' },
-    { name: 'TechFlow Inc', mrr: 1800, score: 41, risk: 'high', trend: -8, lastSeen: '4 days ago' },
-    { name: 'StartupXYZ', mrr: 3100, score: 38, risk: 'high', trend: -3, lastSeen: '2 days ago' },
-    { name: 'BigCo Ltd', mrr: 9500, score: 72, risk: 'low', trend: +5, lastSeen: '1 hour ago' },
-    { name: 'Innovate LLC', mrr: 650, score: 85, risk: 'low', trend: +12, lastSeen: '30 min ago' },
-  ]
+  const [data, setData] = useState<DemoData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchDemoData()
+    // Refresh every 10 seconds for live updates
+    const interval = setInterval(fetchDemoData, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const fetchDemoData = async () => {
+    try {
+      const res = await fetch('/api/demo')
+      const json = await res.json()
+      setData(json)
+    } catch (error) {
+      console.error('Failed to fetch demo data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!data) return <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">Loading...</div>
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -70,17 +108,17 @@ export default function DemoPage() {
             <span className="text-white/30 text-xs ml-2">churnguard.app/dashboard</span>
             <div className="ml-auto flex items-center gap-2 text-xs text-emerald-400">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Live · 42 events/min
+              Live · Aurora DSQL
             </div>
           </div>
 
           {/* Summary metrics */}
           <div className="grid grid-cols-4 gap-4 p-6 border-b border-white/5">
             {[
-              { label: 'Total MRR', value: '$47,280', icon: DollarSign, color: 'text-blue-400' },
-              { label: 'MRR At Risk', value: '$9,100', icon: AlertTriangle, color: 'text-red-400' },
-              { label: 'Critical Risk', value: '3', icon: TrendingDown, color: 'text-red-400' },
-              { label: 'Avg Health', value: '61/100', icon: Users, color: 'text-emerald-400' },
+              { label: 'Total MRR', value: `$${data.summary.totalMRR.toLocaleString()}`, icon: DollarSign, color: 'text-blue-400' },
+              { label: 'MRR At Risk', value: `$${data.summary.mrrAtRisk.toLocaleString()}`, icon: AlertTriangle, color: 'text-red-400' },
+              { label: 'Critical Risk', value: data.summary.criticalCount.toString(), icon: TrendingDown, color: 'text-red-400' },
+              { label: 'Avg Health', value: `${data.summary.avgHealth}/100`, icon: Users, color: 'text-emerald-400' },
             ].map((card) => (
               <motion.div
                 key={card.label}
@@ -98,9 +136,9 @@ export default function DemoPage() {
 
           {/* Customer list */}
           <div className="p-6">
-            <div className="text-sm font-medium text-white/60 mb-4">Customers at Risk — sorted by severity</div>
+            <div className="text-sm font-medium text-white/60 mb-4">Live Customers — sorted by health risk</div>
             <div className="space-y-2">
-              {DEMO_CUSTOMERS.map((customer, i) => (
+              {data.customers.map((customer, i) => (
                 <motion.div
                   key={customer.name}
                   initial={{ opacity: 0, x: -20 }}
@@ -116,9 +154,6 @@ export default function DemoPage() {
                   <div className={`text-2xl font-bold ${getScoreColor(customer.score)}`}>{customer.score}</div>
                   <div className={`text-xs px-2 py-1 rounded-full font-medium ${getRiskColor(customer.risk)}`}>
                     {customer.risk}
-                  </div>
-                  <div className={`text-xs ${customer.trend < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {customer.trend > 0 ? '+' : ''}{customer.trend} pts
                   </div>
                 </motion.div>
               ))}
