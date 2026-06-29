@@ -18,7 +18,7 @@ import postgres from 'postgres'
 
 let sql: ReturnType<typeof postgres> | null = null
 
-function getDb() {
+export function getDb() {
   if (sql) return sql
 
   const connectionString = process.env.DATABASE_URL
@@ -40,8 +40,6 @@ function getDb() {
 
   return sql
 }
-
-export const db = getDb()
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -101,6 +99,7 @@ export type HealthSignals = {
  * Get tenant by their ingest API key (used for event ingestion auth).
  */
 export async function getTenantByApiKey(apiKey: string): Promise<Tenant | null> {
+  const db = getDb()
   const [tenant] = await db<Tenant[]>`
     SELECT * FROM tenants WHERE ingest_api_key = ${apiKey} LIMIT 1
   `
@@ -119,6 +118,7 @@ export async function getTenantCustomers(
   } = {}
 ): Promise<{ customers: Customer[]; total: number }> {
   const { churnRisk, limit = 50, offset = 0 } = options
+  const db = getDb()
 
   const customers = await db<Customer[]>`
     SELECT *
@@ -164,6 +164,7 @@ export async function ingestEvents(
 ): Promise<{ ingested: number; errors: string[] }> {
   const errors: string[] = []
   let ingested = 0
+  const db = getDb()
 
   for (const event of events) {
     try {
@@ -214,6 +215,7 @@ export async function refreshCustomerHealthScore(
   customerId: string,
   tenantId: string
 ): Promise<{ score: number; risk: Customer['churnRisk']; signals: HealthSignals }> {
+  const db = getDb()
   const [result] = await db<[{ score: number; risk: Customer['churnRisk']; signals: HealthSignals }]>`
     SELECT * FROM calculate_health_score(${customerId}::uuid, ${tenantId}::uuid)
   `
@@ -241,6 +243,7 @@ export async function refreshCustomerHealthScore(
  * Get tenant-level health summary for the main dashboard.
  */
 export async function getTenantHealthSummary(tenantId: string) {
+  const db = getDb()
   const [summary] = await db`
     SELECT * FROM tenant_health_summary WHERE tenant_id = ${tenantId}
   `

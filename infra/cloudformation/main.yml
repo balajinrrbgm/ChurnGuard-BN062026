@@ -187,7 +187,9 @@ Resources:
                 "title": "Lambda Health Recalculator Invocations",
                 "metrics": [["AWS/Lambda", "Invocations", "FunctionName", "${HealthScoreFunction}"]],
                 "period": 300,
-                "stat": "Sum"
+                "stat": "Sum",
+                "region": "eu-central-1",
+                "yAxis": {"left": {"min": 0}}
               }
             },
             {
@@ -199,7 +201,9 @@ Resources:
                   ["AWS/Lambda", "Errors", "FunctionName", "${PlaybookExecutorFunction}"]
                 ],
                 "period": 300,
-                "stat": "Sum"
+                "stat": "Sum",
+                "region": "eu-central-1",
+                "yAxis": {"left": {"min": 0}}
               }
             }
           ]

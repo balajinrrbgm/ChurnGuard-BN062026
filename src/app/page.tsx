@@ -285,10 +285,12 @@ export default function LandingPage() {
           <p className="text-white/50 mb-8">3 lines of code to start tracking customer health</p>
           <div className="bg-[#111] rounded-2xl p-6 text-left font-mono text-sm border border-white/10">
             <div className="text-white/40 mb-2">// npm install @churnguard/sdk</div>
-            <div><span className="text-blue-400">import</span> <span className="text-white">{'{ ChurnGuard }'}</span> <span className="text-blue-400">from</span> <span className="text-green-400">&apos;@churnguard/sdk&apos;</span></div>
-            <div className="mt-2"><span className="text-blue-400">const</span> <span className="text-white">cg = </span><span className="text-blue-400">new</span> <span className="text-yellow-400">ChurnGuard</span><span className="text-white">({'{ apiKey: process.env.CHURNGUARD_KEY }'})</span></div>
+            <div><span className="text-blue-400">import</span> <span className="text-white">{"{ ChurnGuard }"}</span> <span className="text-blue-400">from</span> <span className="text-green-400">'@churnguard/sdk'</span></div>
+            <div className="mt-2"><span className="text-blue-400">const</span> <span className="text-white">cg = </span><span className="text-blue-400">new</span> <span className="text-yellow-400">ChurnGuard</span><span className="text-white">({"{ apiKey: process.env.CHURNGUARD_KEY }"})
+            </span></div>
             <div className="mt-4 text-white/40">// Track any customer event</div>
-            <div><span className="text-blue-400">await</span> <span className="text-white">cg.</span><span className="text-yellow-400">track</span><span className="text-white">{'({ customerId: userId, event: '}</span><span className="text-green-400">&apos;feature_used&apos;</span><span className="text-white">, name: </span><span className="text-green-400">&apos;export_csv&apos;</span> <span className="text-white">})</span></div>
+            <div><span className="text-blue-400">await</span> <span className="text-white">cg.</span><span className="text-yellow-400">track</span><span className="text-white">({"{ customerId: userId, event: 'feature_used' }"})
+            </span></div>
             <div className="mt-2 text-white/40">// Aurora DSQL updates health score globally in milliseconds</div>
           </div>
         </div>

@@ -13,7 +13,7 @@
  */
 
 import { NextRequest } from 'next/server'
-import { getTenantByApiKey, ingestEvents, refreshCustomerHealthScore } from '@/lib/db'
+import { getTenantByApiKey, ingestEvents, refreshCustomerHealthScore, getDb } from '@/lib/db'
 import { z } from 'zod'
 
 // Rate limit: max 1000 events per request
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     for (const externalId of uniqueCustomerIds.slice(0, 20)) { // limit to 20 per request
       try {
         // Re-query to get internal UUID for this external ID
-        const { db } = await import('@/lib/db')
+        const db = getDb()
         const [customer] = await db<{ id: string }[]>`
           SELECT id FROM customers
           WHERE tenant_id = ${tenant.id} AND external_id = ${externalId}
